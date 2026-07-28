@@ -1,46 +1,130 @@
-# Battery Menu
+<p align="center">
+  <img src="Resources/AppIcon.png" width="128" alt="Battery Menu app icon">
+</p>
 
-原生 macOS 菜单栏电池监测工具，读取并展示：
+<h1 align="center">Battery Menu</h1>
 
-- 当前电量、供电来源与充电状态
-- 电池温度、最大容量、健康状态和循环次数
-- 适配器名称、额定功率、电压和实时输入电流
-- 适配器输入、系统负载与电池功率遥测
-- 最近 30 分钟功率曲线，记录会在应用重启后保留
-- 跟随系统、浅色和深色三种主题
-- 使用 macOS POWER 指标估算并展示当前高耗能 App
-- 原生设置窗口，可分别显示或隐藏各个信息模块
-- 菜单栏可分别显示电池图标、电量、温度和系统功率
+<p align="center">
+  A native macOS menu bar monitor for battery health, power flow, and energy usage.
+</p>
 
-所有数据均在本机读取，不联网、不修改充电设置，也不需要管理员权限。
+<p align="center">
+  <strong>English</strong> · <a href="README.zh-CN.md">简体中文</a>
+</p>
 
-## 运行
+Battery Menu reads macOS hardware telemetry and presents it in a compact,
+customizable menu bar panel. All data stays on your Mac. The app does not
+connect to a server, change charging behavior, or require administrator access.
+
+## Features
+
+- Battery percentage, charging state, power source, temperature, health, and
+  cycle count
+- Adapter name, rated power, voltage, current, and live input power
+- Separate adapter output, battery output, and estimated system load
+- Persistent power history for the most recent 30 minutes
+- Current high-energy apps estimated from the macOS `POWER` metric
+- Configurable menu bar items: battery icon, percentage, temperature, and power
+- Optional panel modules for charge, health, power, history, apps, and adapter
+- System, light, and dark appearances with native macOS materials
+- Native SwiftUI menu bar experience with no Dock icon
+
+## Requirements
+
+- macOS 13 Ventura or later
+- Apple silicon or Intel Mac with battery telemetry exposed by macOS
+- Swift 6 toolchain when building from source
+
+Some hardware fields vary by Mac model and macOS version. Missing values are
+shown as `—` instead of being estimated.
+
+## Install
+
+### Download a release
+
+Download the latest package from
+[GitHub Releases](https://github.com/985860612/battery-menu/releases), unzip it,
+and move `Battery Menu.app` to `/Applications`.
+
+Current release archives use an ad-hoc signature and are not Apple-notarized.
+If macOS blocks the first launch, open **System Settings → Privacy & Security**
+and explicitly allow the app.
+
+### Build from source
 
 ```bash
+git clone https://github.com/985860612/battery-menu.git
 cd battery-menu
-chmod +x scripts/build-app.sh
 ./scripts/build-app.sh
 open "dist/Battery Menu.app"
 ```
 
-运行后，应用只出现在 macOS 菜单栏，不显示 Dock 图标。
+The build script creates a Release binary, assembles the application bundle,
+copies the app icon, and applies an ad-hoc signature.
 
-## 查看原始快照
+## Usage
 
-```bash
-swift run battery-dump
+Launch the app, then select its battery item in the menu bar. Use the settings
+button at the bottom of the panel to choose an appearance, enable or disable
+panel modules, and configure the information shown in the menu bar.
+
+Power history is stored locally at:
+
+```text
+~/Library/Application Support/Battery Menu/power-history.json
 ```
 
-## 开发检查
+Use the trash button in the power chart to clear it.
+
+## Data sources
+
+| Data | macOS source | Notes |
+| --- | --- | --- |
+| Battery percentage and charging state | IOKit Power Sources API | Standard system power-source data |
+| Temperature, cycles, adapter, and power | `AppleSmartBattery` in IORegistry | Availability and field names vary by hardware |
+| Maximum capacity | `system_profiler -json SPPowerDataType` | Refreshed at a low frequency |
+| High-energy apps | `/usr/bin/top` `POWER` samples + `/bin/ps` | A live estimate, not Activity Monitor's 12-hour history |
+
+## Privacy
+
+- No network requests
+- No analytics or telemetry uploads
+- No administrator privileges
+- No charging-limit or power-management changes
+- Only the 30-minute power chart is persisted locally
+
+## Development
 
 ```bash
 swift build
 swift run battery-dump
+swift run BatteryMenu
 ```
 
-## 数据说明
+`battery-dump` prints the current raw snapshot and is useful when checking
+hardware compatibility.
 
-- 常规电量与供电状态来自 IOKit Power Sources API。
-- 温度、循环次数、适配器与实时功率来自 `AppleSmartBattery` IORegistry。
-- 最大容量由 `system_profiler -json SPPowerDataType` 低频读取，与系统设置中的显示值保持一致。
-- 不同 Mac 机型可能不发布全部遥测字段，界面会对缺失值显示 `—`。
+```text
+Sources/BatteryCore/   Hardware readers, models, and local history
+Sources/BatteryMenu/   Menu bar app, panel, settings, and charts
+Sources/BatteryDump/   Command-line diagnostic tool
+Resources/             App icon source and compiled macOS icon
+Support/               Application bundle metadata
+scripts/               Release app-bundle build script
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting a change.
+
+## Known limitations
+
+- Hardware telemetry relies on macOS interfaces that Apple does not keep
+  identical across every Mac model.
+- High-energy app values are short live samples and should not be compared
+  directly with Activity Monitor's 12-hour energy column.
+- Release archives are not yet signed with an Apple Developer ID or notarized.
+
+## License
+
+Battery Menu is available under the [MIT License](LICENSE).
+
+Copyright (c) 2026 wangxiaojie

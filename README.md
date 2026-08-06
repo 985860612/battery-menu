@@ -12,6 +12,10 @@
   <strong>English</strong> · <a href="README.zh-CN.md">简体中文</a>
 </p>
 
+<p align="center">
+  <img src="battery-menu-ui-preview.png" alt="Battery Menu interface preview">
+</p>
+
 Battery Menu reads macOS hardware telemetry and presents it in a compact,
 customizable menu bar panel. All data stays on your Mac. The app does not
 connect to a server, change charging behavior, or require administrator access.

@@ -12,6 +12,10 @@
   <a href="README.md">English</a> · <strong>简体中文</strong>
 </p>
 
+<p align="center">
+  <img src="battery-menu-ui-preview.png" alt="Battery Menu 界面预览">
+</p>
+
 Battery Menu 读取 macOS 本机硬件遥测数据，并通过紧凑、可配置的菜单栏面板进行展示。
 所有数据均保留在本机；应用不会连接服务器、修改充电行为，也不需要管理员权限。
 
